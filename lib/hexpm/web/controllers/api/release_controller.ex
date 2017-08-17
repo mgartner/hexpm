@@ -41,8 +41,9 @@ defmodule Hexpm.Web.API.ReleaseController do
   end
 
   defp handle_tarball(conn, repository, package, user, body) do
-    case Hexpm.Web.ReleaseTar.metadata(body) do
-      {:ok, meta, checksum} ->
+    case :hex_tar.unpack({:binary, body}) do
+      {:ok, {checksum, meta, _files}} ->
+        checksum = List.to_string(checksum)
         Releases.publish(repository, package, user, body, meta, checksum, audit: audit_data(conn))
 
       {:error, errors} ->

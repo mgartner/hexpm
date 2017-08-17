@@ -58,6 +58,7 @@ defmodule Hexpm.MixProject do
       {:ex_aws, "~> 1.0"},
       {:gpb, "~> 3.23"},
       {:hackney, "~> 1.7"},
+      {:hex_tar, github: "wojtekmach/hex_tar"},
       {:jiffy, "~> 0.14"},
       {:plug, "~> 1.2"},
       {:plug_attack, "~> 0.3"},

@@ -17,7 +17,7 @@ defmodule Hexpm.Repository.Requirement do
 
   def changeset(requirement, params, dependencies, release_changeset, package) do
     cast(requirement, params, ~w(repository name app requirement optional))
-    |> put_assoc(:dependency, dependencies[{params["name"], params["repository"] || "hexpm"}])
+    |> put_assoc(:dependency, dependencies[{params[:name], params[:repository] || "hexpm"}])
     |> validate_required(~w(name app requirement optional)a)
     |> validate_required(:dependency, message: "package does not exist in repository #{inspect package.repository.name}")
     |> validate_requirement(:requirement, pre: get_field(release_changeset, :version).pre != [])
@@ -88,8 +88,8 @@ defmodule Hexpm.Repository.Requirement do
   defp requirement_names(requirements) when is_list(requirements) do
     Enum.flat_map(requirements, fn
       req when is_map(req) ->
-        name = req["name"]
-        repository = req["repository"] || "hexpm"
+        name = req[:name]
+        repository = req[:repository] || "hexpm"
 
         if is_binary(name) and is_binary(repository) do
           [{name, repository}]

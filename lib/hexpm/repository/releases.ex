@@ -142,11 +142,11 @@ defmodule Hexpm.Repository.Releases do
   defp revert_result(result, _package), do: result
 
   defp create_package(multi, repository, package, user, meta) do
-    params = %{"name" => meta["name"], "meta" => meta}
+    params = %{"name" => meta.name, "meta" => meta}
     cond do
       !package ->
         Multi.insert(multi, :package, Package.build(repository, user, params))
-      package.name != meta["name"] ->
+      package.name != meta.name ->
         changeset =
           Package.build(repository, user, params)
           |> add_error(:name, "mismatch between metadata and endpoint")
@@ -157,12 +157,13 @@ defmodule Hexpm.Repository.Releases do
   end
 
   defp create_release(multi, package, checksum, meta) do
-    version = meta["version"]
+    version = meta.version
     params = %{
-      "app" => meta["app"],
+      "app" => meta.app,
       "version" => version,
-      "requirements" => normalize_requirements(meta["requirements"]),
-      "meta" => meta}
+      "requirements" => normalize_requirements(meta.requirements),
+      "meta" => meta
+    }
 
     release = package && Repo.get_by(assoc(package, :releases), version: version)
 
@@ -210,7 +211,7 @@ defmodule Hexpm.Repository.Releases do
   defp normalize_requirements(requirements) when is_map(requirements) do
     Enum.map(requirements, fn
       {name, map} when is_map(map) ->
-        Map.put(map, "name", name)
+        Map.put(map, :name, name)
       other ->
         other
     end)

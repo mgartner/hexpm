@@ -197,7 +197,7 @@ defmodule Hexpm.Web.API.ReleaseControllerTest do
 
     test "update release with different and unresolved requirements", %{user: user, package: package} do
       name = Fake.sequence(:package)
-      reqs = [%{name: package.name, requirement: "~> 0.0.1", app: "app", optional: false}]
+      reqs = %{package.name => %{requirement: "~> 0.0.1", app: "app", optional: false}}
       meta = %{name: name, version: "0.0.1", requirements: reqs, description: "description"}
       conn = build_conn()
              |> put_req_header("content-type", "application/octet-stream")
@@ -208,7 +208,7 @@ defmodule Hexpm.Web.API.ReleaseControllerTest do
       assert result["requirements"] == %{package.name => %{"app" => "app", "optional" => false, "requirement" => "~> 0.0.1"}}
 
       # re-publish with unresolved requirement
-      reqs = [%{name: package.name, requirement: "~> 9.0", app: "app", optional: false}]
+      reqs = %{package.name => %{requirement: "~> 9.0", app: "app", optional: false}}
       meta = %{name: name, version: "0.0.1", requirements: reqs, description: "description"}
       conn = build_conn()
              |> put_req_header("content-type", "application/octet-stream")
@@ -234,8 +234,8 @@ defmodule Hexpm.Web.API.ReleaseControllerTest do
     end
 
     test "create releases with requirements", %{user: user, package: package} do
-      reqs = [%{name: package.name, requirement: "~> 0.0.1", app: "app", optional: false}]
-      meta = %{name: Fake.sequence(:package), version: "0.0.1", requirements: reqs, description: "description"}
+      reqs = %{package.name => %{requirement: "~> 0.0.1", app: "app", optional: false}}
+      meta = %{name: Fake.sequence(:package), version: "0.0.1", requirements: reqs, description: "description", files: []}
       conn = build_conn()
              |> put_req_header("content-type", "application/octet-stream")
              |> put_req_header("authorization", key_for(user))
@@ -254,7 +254,7 @@ defmodule Hexpm.Web.API.ReleaseControllerTest do
     end
 
     test "create releases with requirements validates requirement", %{user: user, package: package} do
-      reqs = [%{name: package.name, requirement: "~> invalid", app: "app", optional: false}]
+      reqs = %{package.name => %{requirement: "~> invalid", app: "app", optional: false}}
       meta = %{name: Fake.sequence(:package), version: "0.0.1", requirements: reqs, description: "description"}
       conn = build_conn()
              |> put_req_header("content-type", "application/octet-stream")
@@ -266,7 +266,7 @@ defmodule Hexpm.Web.API.ReleaseControllerTest do
     end
 
     test "create releases with requirements validates package name", %{user: user} do
-      reqs = [%{name: "nonexistant_package", requirement: "~> 1.0", app: "app", optional: false}]
+      reqs = %{"nonexistant_package" => %{requirement: "~> 1.0", app: "app", optional: false}}
       meta = %{name: Fake.sequence(:package), version: "0.0.1", requirements: reqs, description: "description"}
       conn = build_conn()
              |> put_req_header("content-type", "application/octet-stream")
@@ -278,7 +278,7 @@ defmodule Hexpm.Web.API.ReleaseControllerTest do
     end
 
     test "create releases with requirements validates resolution", %{user: user, package: package} do
-      reqs = [%{name: package.name, requirement: "~> 1.0", app: "app", optional: false}]
+      reqs = %{package.name => %{requirement: "~> 1.0", app: "app", optional: false}}
       meta = %{name: Fake.sequence(:package), version: "0.1.0", requirements: reqs, description: "description"}
       conn = build_conn()
              |> put_req_header("content-type", "application/octet-stream")
@@ -293,7 +293,7 @@ defmodule Hexpm.Web.API.ReleaseControllerTest do
       RegistryBuilder.full_build(Repository.hexpm())
       registry_before = Hexpm.Store.get(nil, :s3_bucket, "registry.ets.gz", [])
 
-      reqs = [%{name: package.name, app: "app", requirement: "~> 0.0.1", optional: false}]
+      reqs = %{package.name => %{app: "app", requirement: "~> 0.0.1", optional: false}}
       meta = %{name: Fake.sequence(:package), app: "app", version: "0.0.1", requirements: reqs, description: "description"}
       build_conn()
       |> put_req_header("content-type", "application/octet-stream")

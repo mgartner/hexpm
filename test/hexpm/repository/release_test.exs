@@ -221,7 +221,7 @@ defmodule Hexpm.Repository.ReleaseTest do
     reqs = [%{name: package3.name, app: package3.name, requirement: "~> 0.0.1", optional: false}]
     release = Release.build(package2, rel_meta(%{version: "0.0.1", app: package2.name, requirements: reqs}), "") |> Hexpm.Repo.insert!
 
-    params = params(%{app: package2.name, requirements: [%{name: package3.name, app: package3.name, requirement: ">= 0.0.1", optional: false}]})
+    params = %{app: package2.name, requirements: [%{name: package3.name, app: package3.name, requirement: ">= 0.0.1", optional: false}]}
     Release.update(release, params, package2, "") |> Hexpm.Repo.update!()
 
     package3_id = package3.id

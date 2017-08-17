@@ -6,6 +6,7 @@ defmodule Hexpm.TestHelpers do
       meta
       |> Map.put_new(:app, meta[:name])
       |> Map.put_new(:build_tools, ["mix"])
+      |> Map.put_new(:files, [])
       |> Map.put_new(:licenses, ["Apache"])
       |> Map.put_new(:requirements, %{})
 
@@ -30,28 +31,17 @@ defmodule Hexpm.TestHelpers do
   end
 
   def rel_meta(params) do
-    params = params(params)
     meta =
       params
-      |> Map.put_new("build_tools", ["mix"])
-      |> Map.update("requirements", [], &requirements_meta/1)
-    Map.put(params, "meta", meta)
+      |> Map.put_new(:build_tools, ["mix"])
+      |> Map.update(:requirements, [], &requirements_meta/1)
+    Map.put(params, :meta, meta)
   end
 
-  def pkg_meta(meta) do
-    params = params(meta)
-    meta = Map.put_new(params, "licenses", ["Apache"])
-    Map.put(params, "meta", meta)
+  def pkg_meta(params) do
+    meta = Map.put_new(params, :licenses, ["Apache"])
+    Map.put(params, :meta, meta)
   end
-
-  def params(params) when is_map(params) do
-    Enum.into(params, %{}, fn
-      {binary, value} when is_binary(binary) -> {binary, params(value)}
-      {atom, value} when is_atom(atom) -> {Atom.to_string(atom), params(value)}
-    end)
-  end
-  def params(params) when is_list(params), do: Enum.map(params, &params/1)
-  def params(other), do: other
 
   defp requirements_meta(list) do
     Enum.map(list, fn req ->
